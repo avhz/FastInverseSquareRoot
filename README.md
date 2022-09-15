@@ -33,7 +33,46 @@ fn inv_sqrt(x: f32) -> f32 {
     y * (1.5 - 0.5 * x * y * y)
 }
 ```
-# Machine code comparison
+# Assembly comparison
 
+# C ASM
 
+```asm
+.LCPI0_0:
+        .long   3204448256              # float -0.5
+.LCPI0_1:
+        .long   1069547520              # float 1.5
+InvSqrt:                                # @InvSqrt
+        movd    eax, xmm0
+        mulss   xmm0, dword ptr [rip + .LCPI0_0]
+        sar     eax
+        mov     ecx, 1597463007
+        sub     ecx, eax
+        movd    xmm1, ecx
+        mulss   xmm0, xmm1
+        mulss   xmm0, xmm1
+        addss   xmm0, dword ptr [rip + .LCPI0_1]
+        mulss   xmm0, xmm1
+        ret
+```
 
+# Rust ASM
+
+```asm
+.LCPI0_0:
+        .long   3204448256        ; f32 -0.5
+.LCPI0_1:
+        .long   1069547520        ; f32  1.5
+example::inv_sqrt:
+        movd    eax, xmm0
+        shr     eax                   ; i << 1
+        mov     ecx, 1597463007       ; 0x5f3759df
+        sub     ecx, eax              ; 0x5f3759df - ...
+        movd    xmm1, ecx
+        mulss   xmm0, dword ptr [rip + .LCPI0_0]    ; x *= 0.5
+        mulss   xmm0, xmm1                          ; x *= y
+        mulss   xmm0, xmm1                          ; x *= y
+        addss   xmm0, dword ptr [rip + .LCPI0_1]    ; x += 1.5
+        mulss   xmm0, xmm1                          ; x *= y
+        ret
+```
