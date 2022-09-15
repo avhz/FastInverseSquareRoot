@@ -37,7 +37,7 @@ fn inv_sqrt(x: f32) -> f32 {
 
 # C ASM
 
-```asm
+```assembly
 .LCPI0_0:
         .long   3204448256              # float -0.5
 .LCPI0_1:
@@ -58,7 +58,7 @@ InvSqrt:                                # @InvSqrt
 
 # Rust ASM
 
-```asm
+```assembly
 .LCPI0_0:
         .long   3204448256        ; f32 -0.5
 .LCPI0_1:
